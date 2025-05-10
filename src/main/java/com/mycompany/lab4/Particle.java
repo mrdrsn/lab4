@@ -27,7 +27,8 @@ public class Particle {
         this.vx = (random.nextFloat() - 0.5f) * 6; // Случайная скорость по X
         this.vy = (random.nextFloat() - 0.5f) * 6; // Случайная скорость по Y
         this.size = 5 + random.nextFloat() * 10; // Случайный размер
-        this.color = new Color(random.nextInt(1), random.nextInt(1), random.nextInt(256 - 100) + 100, 150); // Полупрозрачный цвет
+//        this.color = new Color(random.nextInt(1), random.nextInt(1), random.nextInt(256 - 100) + 100, 150); // Полупрозрачный цвет
+        this.color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256), 150); // Полупрозрачный цвет
         this.life = 30 + random.nextInt(60); // Случайное время жизни
     }
 

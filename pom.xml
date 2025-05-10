@@ -19,6 +19,7 @@
                     <include>**/*.otf</include>
                     <include>**/*.ttf</include>
                     <include>**/*.png</include>
+                    <include>**/*.gif</include>
                 </includes>
             </resource>
         </resources>

@@ -67,7 +67,7 @@ public class ParticlePanel extends JPanel implements MouseMotionListener {
         int count = 1 + random.nextInt(1);// Количество частиц
         a++;
         for (int i = 0; i < count; i++) {
-            if (a % 2 == 1){
+            if (a % 3 == 1){
                 particles.add(new Particle(x, y));
             }
         }
