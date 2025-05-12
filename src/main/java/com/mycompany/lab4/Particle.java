@@ -13,31 +13,28 @@ import java.util.Random;
  * @author nsoko
  */
 public class Particle {
-    private float x, y; // Координаты
-    private float vx, vy; // Скорость
-    private float size; // Размер
-    private Color color; // Цвет
-    private int life; // Время жизни
+    private float x, y;
+    private float vx, vy; 
+    private float size;
+    private Color color;
+    private int life;
 
     public Particle(int startX, int startY) {
         this.x = startX;
         this.y = startY;
 
         Random random = new Random();
-        this.vx = (random.nextFloat() - 0.5f) * 6; // Случайная скорость по X
-        this.vy = (random.nextFloat() - 0.5f) * 6; // Случайная скорость по Y
-        this.size = 5 + random.nextFloat() * 10; // Случайный размер
-//        this.color = new Color(random.nextInt(1), random.nextInt(1), random.nextInt(256 - 100) + 100, 150); // Полупрозрачный цвет
-        this.color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256), 150); // Полупрозрачный цвет
-        this.life = 30 + random.nextInt(60); // Случайное время жизни
+        this.vx = (random.nextFloat() - 0.5f) * 6;
+        this.vy = (random.nextFloat() - 0.5f) * 6;
+        this.size = 5 + random.nextFloat() * 10;
+        this.color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256), 150); 
+        this.life = 30 + random.nextInt(60);
     }
 
     public boolean update() {
         x += vx;
         y += vy;
         life--;
-
-        // Замедление и исчезновение частицы
         vx *= 0.95f;
         vy *= 0.95f;
         return life <= 0;

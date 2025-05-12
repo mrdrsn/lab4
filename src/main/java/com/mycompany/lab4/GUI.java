@@ -1,23 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.lab4;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,7 +26,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -35,11 +37,8 @@ import javax.swing.SwingConstants;
 public class GUI extends JFrame {
 
     private final JButton backButton = new JButton("< Назад в меню");
-    private final JPanel cardPanelOption1 = GUIDesign.createCardPanel();
-//    private final JPanel mainPanel = new JPanel(new GridBagLayout());
+    private final QueryHandler q = new QueryHandler();
     private final JPanel mainPanel = new BackgroundPanel("back.png");
-//    private final JPanel mainPanel = new BackgroundPanel("meoww.gif");
-//    private final JPanel tablePanel = new JPanel(); //панель для нажатия на кнопку просмотреть информацию
 
     public GUI() {
         super("Лабораторная работа 4");
@@ -70,7 +69,7 @@ public class GUI extends JFrame {
         JFrame frame = new JFrame("Учетная система магазина волшебных палочек");
         frame.setSize(1280, 720);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null); // Центрирование окна
+        frame.setLocationRelativeTo(null);
 
         mainPanel.setBackground(Color.WHITE);
 
@@ -95,7 +94,8 @@ public class GUI extends JFrame {
         showInfoButton.addActionListener(e -> {
             clearPanel(mainPanel);
             GUIDesign.setFooterPanelDesign(footerPanel, exitButton, backButton);
-            GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, null, showWandSailsButton, showInventoryButton, showCustomersButton);
+            GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, null,
+                    showWandSailsButton, showInventoryButton, showCustomersButton);
             showInfoButton.setEnabled(false);
         });
         makeWandButton.addActionListener(e -> {
@@ -115,7 +115,15 @@ public class GUI extends JFrame {
             GUIDesign.setFooterPanelDesign(footerPanel, exitButton, backButton);
         });
         rebootButton.addActionListener(e -> {
-
+            int confirm = JOptionPane.showConfirmDialog(null, "Вы уверены, что хотите очистить все данные?", "Подтверждение", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    q.clearAllData();
+                    JOptionPane.showMessageDialog(null, "Все данные успешно очищены!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Ошибка при очистке данных: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         });
         exitButton.addActionListener(e -> {
             System.exit(0);
@@ -125,50 +133,58 @@ public class GUI extends JFrame {
             clearPanel(mainPanel);
             JPanel tablePanel = new JPanel();
             tablePanel.setPreferredSize(new Dimension(900, 400));
-            JTable table = pasteTableInto(tablePanel);
+            JTable table = q.getWandsTable();
+            pasteTableInto(table, tablePanel);
             mainPanel.add(tablePanel);
         });
         showInventoryButton.addActionListener(e -> {
             clearPanel(mainPanel);
-            BackgroundPanel gifPanel = new BackgroundPanel("gif.gif");
-            gifPanel.setPreferredSize(new Dimension(900, 400));
-            mainPanel.add(gifPanel);
-            GUIDesign.insertTable(mainPanel, "таблица которую нужно отобразить");
+            JPanel tablePanel = new JPanel();
+            tablePanel.setPreferredSize(new Dimension(900, 400));
+            JTable table = q.getStockTable();
+            pasteTableInto(table, tablePanel);
+            mainPanel.add(tablePanel);
+
         });
         showCustomersButton.addActionListener(e -> {
             clearPanel(mainPanel);
-            GUIDesign.insertTable(mainPanel, "таблица которую нужно отобразить");
+            JPanel tablePanel = new JPanel();
+            tablePanel.setPreferredSize(new Dimension(900, 400));
+            JTable table = q.getCustomersTable();
+            pasteTableInto(table, tablePanel);
+            mainPanel.add(tablePanel);
         });
 
         backButton.addActionListener(e -> {
             clearPanel(footerPanel);
             clearPanel(mainPanel);
             showInfoButton.setEnabled(true);
-            GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, makeWandButton, sellWandButton, orderDeliveryButton, rebootButton);
+            GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, makeWandButton,
+                    sellWandButton, orderDeliveryButton, rebootButton);
             GUIDesign.setFooterPanelDesign(footerPanel, exitButton);
         });
 
         footerPanel.add(exitButton);
-        GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, makeWandButton, sellWandButton, orderDeliveryButton, rebootButton);
+        GUIDesign.setMainPanelDesign(mainPanel, questionLabel, showInfoButton, makeWandButton,
+                sellWandButton, orderDeliveryButton, rebootButton);
         GUIDesign.setFooterPanelDesign(footerPanel, exitButton);
-        GUIDesign.buttonDesign(showInfoButton, 18, "#fff8e7");
-        GUIDesign.buttonDesign(showWandSailsButton, 18, "#fff8e7");
-        GUIDesign.buttonDesign(showInventoryButton, 18, "#fff8e7");
-        GUIDesign.buttonDesign(showCustomersButton, 18, "#fff8e7");
+        GUIDesign.buttonDesign(showInfoButton, 18, "#fff7ca");
+        GUIDesign.buttonDesign(showWandSailsButton, 18, "#fff7ca");
+        GUIDesign.buttonDesign(showInventoryButton, 18, "#fff7ca");
+        GUIDesign.buttonDesign(showCustomersButton, 18, "#fff7ca");
 
-        GUIDesign.buttonDesign(makeWandButton, 18, "#fff8e7");
-        GUIDesign.buttonDesign(sellWandButton, 18, "#fff8e7");
-        GUIDesign.buttonDesign(orderDeliveryButton, 18, "#fff8e7");
+        GUIDesign.buttonDesign(makeWandButton, 18, "#fff7ca");
+        GUIDesign.buttonDesign(sellWandButton, 18, "#fff7ca");
+        GUIDesign.buttonDesign(orderDeliveryButton, 18, "#fff7ca");
         GUIDesign.buttonDesign(rebootButton, 18, "#ffe1da");
         GUIDesign.buttonDesign(exitButton, 18, "#ffb8b3");
         GUIDesign.buttonDesign(backButton, 15, "#e6d0ff");
 
         JPanel contentPane = new JPanel(new BorderLayout());
-        contentPane.add(mainPanel, BorderLayout.CENTER); // Верхняя часть
-        contentPane.add(footerPanel, BorderLayout.SOUTH); // Нижняя часть
+        contentPane.add(mainPanel, BorderLayout.CENTER);
+        contentPane.add(footerPanel, BorderLayout.SOUTH);
 
         frame.add(contentPane);
-
         frame.setVisible(true);
     }
 
@@ -179,15 +195,28 @@ public class GUI extends JFrame {
     }
 
     private void makeWandPanel(JPanel panel) {
-        String[] woodOptions = {"Дуб", "Орех", "Бук", "Кедр"};
-        String[] coreOptions = {"Перо феникса", "Хвост единорога", "Сердечина дракона"};
+        String[] woodOptions = q.getWoodNames();
+        String[] coreOptions = q.getCoreNames();
         JComboBox<String> woodComboBox = new JComboBox<>(woodOptions);
         JComboBox<String> coreComboBox = new JComboBox<>(coreOptions);
 
         JButton setForSaleButton = new JButton("Выставить на продажу");
 
         setForSaleButton.addActionListener(e -> {
-            System.out.println(woodComboBox.getSelectedItem().toString() + " " + coreComboBox.getSelectedItem().toString());
+            String selectedWood = woodComboBox.getSelectedItem().toString();
+            String selectedCore = coreComboBox.getSelectedItem().toString();
+            boolean isAvailable = q.checkStockAvailability(selectedWood, selectedCore);
+
+            if (isAvailable) {
+                try {
+                    q.createWandAndDeductStock(selectedWood, selectedCore);
+                    JOptionPane.showMessageDialog(panel, "Палочка из " + selectedWood + " и " + selectedCore + " успешно выставлена на продажу.", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Ошибка при выставлении палочки на продажу: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Недостаточно материалов на складе для создания палочки.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         GUIDesign.createWandPanelDesign(panel, woodOptions, coreOptions, woodComboBox, coreComboBox, setForSaleButton);
@@ -199,68 +228,117 @@ public class GUI extends JFrame {
         JPanel tablePanel = new JPanel();
         JLabel selectCustomerLabel = new JLabel("Выберите покупателя");
 
-        String[] customerOptions = {"1", "2", "3"};
+        String[] customerNames = q.getCustomerNames();
 
+        String[] customerOptions = new String[customerNames.length + 1];
+        System.arraycopy(customerNames, 0, customerOptions, 0, customerNames.length);
+        customerOptions[customerNames.length] = "Добавить нового покупателя";
         JComboBox<String> customerComboBox = new JComboBox<>(customerOptions);
+        
+        customerComboBox.addActionListener(e -> {
+            String selectedOption = (String) customerComboBox.getSelectedItem();
+            if ("Добавить нового покупателя".equals(selectedOption)) {
+                openAddCustomerDialog(panel);
+            }
+        });
+
         JButton sellButton = new JButton("Продать");
-        JTable table = pasteTableInto(tablePanel);
+        JTable table = q.getAvailableWandsTable();
+        pasteTableInto(table, tablePanel);
+
         sellButton.addActionListener(e -> {
             try {
                 if (table.getSelectedRow() == -1) {
-                    throw new NullPointerException();
+                    throw new NullPointerException("Строка не выбрана.");
                 }
-                System.out.println(table.getSelectedColumn());
-                System.out.println((table.getSelectedRow() + 1) + " " + customerComboBox.getSelectedItem().toString());
-            } catch (NullPointerException ex) {
 
-                JOptionPane.showMessageDialog(null, "Выберите строку");
+                int selectedRow = table.getSelectedRow();
+                int wandId = (int) table.getValueAt(selectedRow, 0);
+
+                String selectedCustomerName = customerComboBox.getSelectedItem().toString();
+
+                q.sellWandAndUpdateCustomer(wandId, selectedCustomerName);
+
+                JOptionPane.showMessageDialog(panel, "Палочка успешно продана!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                table.setModel(q.getAvailableWandsTable().getModel());
+
+            } catch (NullPointerException ex) {
+                JOptionPane.showMessageDialog(panel, "Выберите строку и покупателя.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panel, "Ошибка при продаже палочки: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         GUIDesign.sellWandPanelDesign(panel, titleLabel, selectWandLabel, tablePanel, selectCustomerLabel, customerOptions, customerComboBox, sellButton);
     }
     
-    private JTable prepareTable(){
-        //метод для сбора данных для таблицы (???)
-        return new JTable();
+    private void openAddCustomerDialog(JPanel parentPanel) {
+        JDialog addCustomerDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(parentPanel), "Добавить нового покупателя", true);
+        addCustomerDialog.setSize(400, 200);
+        addCustomerDialog.setLayout(new BorderLayout());
+
+        JTextField nameField = new JTextField();
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        inputPanel.add(new JLabel("Введите имя покупателя:"), BorderLayout.NORTH);
+        inputPanel.add(nameField, BorderLayout.CENTER);
+
+        JButton addButton = new JButton("Добавить");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String customerName = nameField.getText().trim();
+                if (customerName.isEmpty()) {
+                    JOptionPane.showMessageDialog(addCustomerDialog, "Имя не может быть пустым!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try {
+                    q.addNewCustomer(customerName);
+                    updateCustomerComboBox(parentPanel);
+                    addCustomerDialog.dispose();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(addCustomerDialog, "Ошибка при добавлении покупателя: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        addCustomerDialog.add(inputPanel, BorderLayout.CENTER);
+        addCustomerDialog.add(addButton, BorderLayout.SOUTH);
+
+        addCustomerDialog.setLocationRelativeTo(parentPanel);
+        addCustomerDialog.setVisible(true);
+    }
+    
+        private void updateCustomerComboBox(JPanel parentPanel) {
+        for (Component component : parentPanel.getComponents()) {
+            if (component instanceof JComboBox<?>) {
+                JComboBox<String> comboBox = (JComboBox<String>) component;
+
+                String[] updatedCustomerNames = q.getCustomerNames();
+                String[] updatedCustomerOptions = new String[updatedCustomerNames.length + 1];
+                System.arraycopy(updatedCustomerNames, 0, updatedCustomerOptions, 0, updatedCustomerNames.length);
+                updatedCustomerOptions[updatedCustomerNames.length] = "Добавить нового покупателя";
+
+                comboBox.setModel(new DefaultComboBoxModel<>(updatedCustomerOptions));
+                break;
+            }
+        }
     }
 
-    private JTable pasteTableInto(JPanel panel) {
-        String[] columnNames = {"ID", "Древесина", "Сердцевина"};
-        Object[][] data = new Object[10][3];
+    private void pasteTableInto(JTable table, JPanel panel) {
+        table.setFillsViewportHeight(true);
 
-        String[] woodOptions = {"Дуб", "Орех", "Бук", "Кедр", "Ясень", "Махагон", "Гикори", "Вишня", "Красное дерево", "Ель"};
-        String[] coreOptions = {"Перо феникса", "Хвост единорога", "Сердечина дракона", "Чешуя василиска"};
-
-        for (int i = 0; i < 10; i++) {
-            data[i][0] = i + 1; // ID
-            data[i][1] = woodOptions[i % woodOptions.length]; // Древесина
-            data[i][2] = coreOptions[i % coreOptions.length]; // Сердцевина
-        }
-
-        // Создаем таблицу
-        JTable table = new JTable(data, columnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Запрещаем редактирование всех ячеек
-            }
-        };
-        table.setFillsViewportHeight(true); // Растягиваем таблицу по высоте
-
-        // Настройка шрифта для таблицы
         Font customFont = CustomFontLoader.loadCustomFont(18, "pixy.ttf");
         table.setFont(customFont);
         table.getTableHeader().setFont(customFont);
 
-        // Добавляем таблицу в JScrollPane для прокрутки
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(600, 400)); // Размер таблицы
+        scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        // Добавляем JScrollPane в панель
         panel.setLayout(new BorderLayout());
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        return table;
     }
 
     private void orderDeliveryPanel(JPanel panel) {
@@ -273,17 +351,14 @@ public class GUI extends JFrame {
         buttonGroup.add(woodButton);
         buttonGroup.add(coreButton);
 
-        String[] woodOptions = {"Дуб", "Орех", "Бук", "Кедр"};
-        String[] coreOptions = {"Перо феникса", "Хвост единорога", "Сердечина дракона"};
+        String[] woodOptions = q.getWoodNames();
+        String[] coreOptions = q.getCoreNames();
         JComboBox<String> comboBox = new JComboBox<>();
-        ActionListener radioButtonListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (woodButton.isSelected()) {
-                    comboBox.setModel(new DefaultComboBoxModel<>(woodOptions));
-                } else if (coreButton.isSelected()) {
-                    comboBox.setModel(new DefaultComboBoxModel<>(coreOptions));
-                }
+        ActionListener radioButtonListener = e -> {
+            if (woodButton.isSelected()) {
+                comboBox.setModel(new DefaultComboBoxModel<>(woodOptions));
+            } else if (coreButton.isSelected()) {
+                comboBox.setModel(new DefaultComboBoxModel<>(coreOptions));
             }
         };
         woodButton.addActionListener(radioButtonListener);
@@ -292,25 +367,41 @@ public class GUI extends JFrame {
         woodButton.setSelected(true);
         comboBox.setModel(new DefaultComboBoxModel<>(woodOptions));
         JTextArea quantityTextArea = new JTextArea(1, 10);
+
+        int[] currentDeliveryId = {0};
+
         JButton orderButton = new JButton("Заказать");
 
         orderButton.addActionListener(e -> {
             int quantity = 0;
             try {
                 String quantityText = quantityTextArea.getText().trim();
-                System.out.println("Введено количество: " + quantityText); // Отладочное сообщение
                 quantity = Integer.parseInt(quantityText);
+                if (quantity <= 0) {
+                    throw new NumberFormatException();
+                }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Введите корректное число");
+                JOptionPane.showMessageDialog(panel, "Введите корректное положительное число", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String selectedButtonText = getSelectedButtonText(buttonGroup);
-            System.out.println("Заказ на: " + selectedButtonText);
-            System.out.println("Тип: " + comboBox.getSelectedItem().toString());
-            System.out.println("Количество: " + quantity);
-        });
-        GUIDesign.orderDeliveryPanelDesign(panel, titleLabel, selectComponentLabel, enterQuantityLabel, buttonGroup, comboBox, woodOptions, coreOptions, quantityTextArea, orderButton);
 
+            String selectedComponent = getSelectedButtonText(buttonGroup);
+            String selectedItem = comboBox.getSelectedItem().toString();
+
+            try {
+                if (currentDeliveryId[0] == 0) {
+                    currentDeliveryId[0] = q.createDeliveryAndGetId();
+                }
+
+                q.addDeliveryItem(currentDeliveryId[0], selectedComponent, selectedItem, quantity);
+
+                JOptionPane.showMessageDialog(panel, "Поставка успешно добавлена!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panel, "Ошибка при добавлении поставки: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        GUIDesign.orderDeliveryPanelDesign(panel, titleLabel, selectComponentLabel, enterQuantityLabel, buttonGroup, comboBox, woodOptions, coreOptions, quantityTextArea, orderButton);
     }
 
     private static String getSelectedButtonText(ButtonGroup buttonGroup) {

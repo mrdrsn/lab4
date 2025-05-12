@@ -4,7 +4,6 @@
  */
 package com.mycompany.lab4;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,21 +12,13 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
@@ -198,10 +189,6 @@ public class GUIDesign {
         panel.setBackground(Color.decode("#ebf4ff"));
     }
 
-    public static void insertTable(JPanel panel, String smth) {
-
-    }
-
     public static void createWandPanelDesign(JPanel panel, String[] woodOptions, String[] coreOptions, JComboBox<String> woodComboBox, JComboBox<String> coreComboBox, JButton setForSaleButton) {
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -256,7 +243,7 @@ public class GUIDesign {
         JLabel coreLabel = new JLabel("Выберите сердцевину:");
         coreLabel.setFont(customFont2);
 
-        buttonDesign(setForSaleButton, 25, "#fff8e7");
+        buttonDesign(setForSaleButton, 25, "#faffb6");
         setForSaleButton.setPreferredSize(new Dimension(400, 50));
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -286,13 +273,15 @@ public class GUIDesign {
 
     }
 
-    public static void sellWandPanelDesign(JPanel panel, JLabel titleLabel, JLabel selectWandLabel, JPanel tablePanel, JLabel selectCustomerLabel, String[] customerOptions,
+    public static void sellWandPanelDesign(JPanel panel, JLabel titleLabel, JLabel selectWandLabel,
+            JPanel tablePanel, JLabel selectCustomerLabel, String[] customerOptions,
             JComboBox<String> customerComboBox, JButton sellButton) {
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         Font customFont1 = CustomFontLoader.loadCustomFont(42, "pixy.ttf");
         Font customFont2 = CustomFontLoader.loadCustomFont(24, "pixy.ttf");
+        Font customFont3 = CustomFontLoader.loadCustomFont(20, "pixy.ttf");
 
         titleLabel.setFont(customFont1);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -339,13 +328,14 @@ public class GUIDesign {
         gbc.anchor = GridBagConstraints.NORTH;
         customerComboBox.setPreferredSize(new Dimension(200, 50));
         customerComboBox.setMaximumSize(new Dimension(200, 50));
+        customerComboBox.setFont(customFont3);
         panel.add(customerComboBox, gbc);
 
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 10, 10, 70);
         gbc.anchor = GridBagConstraints.NORTH;
         sellButton.setPreferredSize(new Dimension(200, 50));
-        buttonDesign(sellButton, 20, "#fff8e7");
+        buttonDesign(sellButton, 20, "#faffb6");
         panel.add(sellButton, gbc);
     }
 
@@ -421,7 +411,7 @@ public class GUIDesign {
         quantityTextArea.setFont(customFont1);
 
         //кнопка "Заказать"
-        buttonDesign(orderButton, 20, "#fff8e7");
+        buttonDesign(orderButton, 20, "#faffb6");
 
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -454,7 +444,7 @@ public class GUIDesign {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                if (color.equals("#fff8e7")) {
+                if (color.equals("#fff7ca") || color.equals("#faffb6")) {
                     button.setBackground(Color.decode("#ffe0b0"));
                 } else if (color.equals("#e6d0ff")) {
                     button.setBackground(Color.decode("#dbb8ff"));
@@ -470,19 +460,5 @@ public class GUIDesign {
         });
     }
 
-    public static JPanel createCardPanel() {
-        JPanel cardPanel = new JPanel(new CardLayout());
-        cardPanel.setOpaque(false);
-        return cardPanel;
-    }
-
-    public static void addCard(JPanel cardPanel, JPanel panel, String name) {
-        cardPanel.add(panel, name);
-    }
-
-    public static void showCard(JPanel cardPanel, String name) {
-        CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
-        cardLayout.show(cardPanel, name);
-    }
 
 }

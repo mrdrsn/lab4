@@ -19,10 +19,8 @@ public class ParticlePanel extends JPanel implements MouseMotionListener {
     private final Random random = new Random();
 
     public ParticlePanel() {
-        setBackground(Color.WHITE); // Фон окна
-        addMouseMotionListener(this); // Отслеживание движения мыши
-
-        // Таймер для обновления анимации
+        setBackground(Color.WHITE); 
+        addMouseMotionListener(this); 
         Timer timer = new Timer(30, e -> {
             updateParticles();
             repaint();
@@ -34,15 +32,12 @@ public class ParticlePanel extends JPanel implements MouseMotionListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-
-        // Отрисовка всех частиц
         for (Particle particle : particles) {
             particle.draw(g2d);
         }
     }
 
     private void updateParticles() {
-        // Обновление состояния частиц
         for (int i = particles.size() - 1; i >= 0; i--) {
             Particle particle = particles.get(i);
             if (particle.update()) {
@@ -62,9 +57,8 @@ public class ParticlePanel extends JPanel implements MouseMotionListener {
     }
 
     private static int a = 0;
-    // Создание новых частиц в месте курсора
     private void spawnParticles(int x, int y) {
-        int count = 1 + random.nextInt(1);// Количество частиц
+        int count = 1 + random.nextInt(1);
         a++;
         for (int i = 0; i < count; i++) {
             if (a % 3 == 1){
