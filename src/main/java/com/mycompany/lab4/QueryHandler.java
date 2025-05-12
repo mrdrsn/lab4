@@ -1,5 +1,6 @@
 package com.mycompany.lab4;
 
+import java.awt.List;
 import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,19 +38,23 @@ public class QueryHandler {
         return coreNamesList.toArray(new String[0]);
     }
 
-    public String[] getCustomerNames() {
-        String query = "SELECT name FROM Customers";
-        ArrayList<String> customerNamesList = new ArrayList<>();
-        try (Connection connection = DataBaseHandler.getConnection(); PreparedStatement statement = connection.prepareStatement(query); ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                String customerName = resultSet.getString("name");
-                customerNamesList.add(customerName);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+public String[] getCustomerNames() {
+    String query = "SELECT DISTINCT name FROM Customers ORDER BY name";
+    ArrayList<String> customerNames = new ArrayList<>();
+
+    try (Connection connection = DataBaseHandler.getConnection();
+         PreparedStatement statement = connection.prepareStatement(query);
+         ResultSet resultSet = statement.executeQuery()) {
+
+        while (resultSet.next()) {
+            customerNames.add(resultSet.getString("name"));
         }
-        return customerNamesList.toArray(new String[0]);
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return customerNames.toArray(new String[0]);
+}
 
     public boolean checkStockAvailability(String woodName, String coreName) {
         String query = "SELECT "
@@ -451,10 +456,21 @@ public class QueryHandler {
     }
 
     public void addNewCustomer(String customerName) throws SQLException {
+        String checkQuery = "SELECT COUNT(*) FROM Customers WHERE name = ?";
+        try (Connection connection = DataBaseHandler.getConnection(); PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+
+            checkStatement.setString(1, customerName);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    throw new SQLException("Покупатель с именем '" + customerName + "' уже существует.");
+                }
+            }
+        }
         String insertCustomerQuery = "INSERT INTO Customers (name) VALUES (?)";
-        try (Connection connection = DataBaseHandler.getConnection(); PreparedStatement statement = connection.prepareStatement(insertCustomerQuery)) {
-            statement.setString(1, customerName);
-            statement.executeUpdate();
+        try (Connection connection = DataBaseHandler.getConnection(); PreparedStatement insertStatement = connection.prepareStatement(insertCustomerQuery)) {
+
+            insertStatement.setString(1, customerName);
+            insertStatement.executeUpdate();
         }
     }
 }

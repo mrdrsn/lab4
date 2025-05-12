@@ -234,7 +234,7 @@ public class GUI extends JFrame {
         System.arraycopy(customerNames, 0, customerOptions, 0, customerNames.length);
         customerOptions[customerNames.length] = "Добавить нового покупателя";
         JComboBox<String> customerComboBox = new JComboBox<>(customerOptions);
-        
+
         customerComboBox.addActionListener(e -> {
             String selectedOption = (String) customerComboBox.getSelectedItem();
             if ("Добавить нового покупателя".equals(selectedOption)) {
@@ -271,7 +271,7 @@ public class GUI extends JFrame {
 
         GUIDesign.sellWandPanelDesign(panel, titleLabel, selectWandLabel, tablePanel, selectCustomerLabel, customerOptions, customerComboBox, sellButton);
     }
-    
+
     private void openAddCustomerDialog(JPanel parentPanel) {
         JDialog addCustomerDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(parentPanel), "Добавить нового покупателя", true);
         addCustomerDialog.setSize(400, 200);
@@ -309,13 +309,13 @@ public class GUI extends JFrame {
         addCustomerDialog.setLocationRelativeTo(parentPanel);
         addCustomerDialog.setVisible(true);
     }
-    
-        private void updateCustomerComboBox(JPanel parentPanel) {
+
+    private void updateCustomerComboBox(JPanel parentPanel) {
         for (Component component : parentPanel.getComponents()) {
             if (component instanceof JComboBox<?>) {
                 JComboBox<String> comboBox = (JComboBox<String>) component;
-
                 String[] updatedCustomerNames = q.getCustomerNames();
+
                 String[] updatedCustomerOptions = new String[updatedCustomerNames.length + 1];
                 System.arraycopy(updatedCustomerNames, 0, updatedCustomerOptions, 0, updatedCustomerNames.length);
                 updatedCustomerOptions[updatedCustomerNames.length] = "Добавить нового покупателя";
